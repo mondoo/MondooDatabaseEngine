@@ -47,10 +47,14 @@ public:
 
 		auto CB = [](void* instance, int argc, char** argv, char** colName) {
 			std::cout << "Hello world!" << std::endl;
-			return static_cast<DB*>(instance)->PrintUpdate(argc, argv, colName);
+			if (argc >= 0)
+			{
+				return static_cast<DB*>(instance)->PrintUpdate(argc, argv, colName);
+			}
+			return -1;
 		};
 
-		Statement(fmt::format("INSERT INTO {} ({}) VALUES ({})", table, key, value), CB, this);
+		Statement(fmt::format("INSERT INTO {} ({}) VALUES ({}); SELECT last_insert_rowid();", table, key, value), CB, this);
 
 		Statement("SELECT * FROM test", CB, this);
 		
