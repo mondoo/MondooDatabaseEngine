@@ -36,6 +36,12 @@ void SQL::Exec(const std::string& sql, int (*fn)(void*, int, char**, char**) /* 
 	char* errorMsg = 0;
 	int response;
 
+	if (m_db == nullptr)
+	{
+		PrintError("No database connection open.", NULL);
+		return;
+	}
+
 	if (fn)
 	{
 		typedef int function_t(void*, int, char**, char**);
