@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "Types.h"
+
 class QueryBuilder;
 
 class SQLCompiler
@@ -12,5 +14,5 @@ public:
 	static std::string CompileUpdate(QueryBuilder& query);
 	static std::string CompileDelete(QueryBuilder& query);
 
-	static std::string CompileWhere(std::pair<std::string, std::string>& where);
+	static std::string CompileWhere(std::pair<std::string, ValueType>& where);
 };

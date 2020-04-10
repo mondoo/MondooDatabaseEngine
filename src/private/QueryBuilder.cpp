@@ -29,14 +29,14 @@ QueryBuilder* QueryBuilder::Select(std::vector<std::string> columns /* = {} */)
 	return this;
 }
 
-QueryBuilder* QueryBuilder::Insert(std::map<std::string, std::string> values /* = std::map<std::string, std::string>() */)
+QueryBuilder* QueryBuilder::Insert(std::map<std::string, ValueType> values)
 {
 	if (SetQueryType(QueryType::Insert))
 	{
 		return this;
 	}
 
-	for (std::map<std::string, std::string>::iterator it = values.begin(); it != values.end(); ++it)
+	for (std::map<std::string, ValueType>::iterator it = values.begin(); it != values.end(); ++it)
 	{
 		m_columns.push_back(it->first);
 		m_values.push_back(it->second);
@@ -45,7 +45,7 @@ QueryBuilder* QueryBuilder::Insert(std::map<std::string, std::string> values /* 
 	return this;
 }
 
-QueryBuilder* QueryBuilder::Insert(std::vector<std::string> values /* = std::vector<std::string>() */)
+QueryBuilder* QueryBuilder::Insert(std::vector<ValueType> values)
 {
 	if (SetQueryType(QueryType::Insert))
 	{
@@ -57,14 +57,14 @@ QueryBuilder* QueryBuilder::Insert(std::vector<std::string> values /* = std::vec
 	return this;
 }
 
-QueryBuilder* QueryBuilder::Update(std::map<std::string, std::string> values)
+QueryBuilder* QueryBuilder::Update(std::map<std::string, ValueType> values)
 {
 	if (SetQueryType(QueryType::Update))
 	{
 		return this;
 	}
 
-	for (std::map<std::string, std::string>::iterator it = values.begin(); it != values.end(); ++it)
+	for (std::map<std::string, ValueType>::iterator it = values.begin(); it != values.end(); ++it)
 	{
 		m_columns.push_back(it->first);
 		m_values.push_back(it->second);
@@ -83,7 +83,7 @@ QueryBuilder* QueryBuilder::Delete()
 	return this;
 }
 
-QueryBuilder* QueryBuilder::Where(std::pair<std::string, std::string> values)
+QueryBuilder* QueryBuilder::Where(std::pair<std::string, ValueType> values)
 {
 	m_where = values;
 	return this;
@@ -109,14 +109,14 @@ const std::string QueryBuilder::GetValues()
 	return WrapParts(m_values);
 }
 
-const std::vector<std::string>& QueryBuilder::GetValuesRaw()
+const std::vector<ValueType>& QueryBuilder::GetValuesRaw()
 {
 	return m_values;
 }
 
-const std::map<std::string, std::string> QueryBuilder::GetValueMap()
+const std::map<std::string, ValueType> QueryBuilder::GetValueMap()
 {
-	std::map<std::string, std::string> valueMap;
+	std::map<std::string, ValueType> valueMap;
 
 	const size_t columnCount = GetColumnsRaw().size();
 	const size_t valueCount = GetValuesRaw().size();
@@ -134,7 +134,7 @@ const std::map<std::string, std::string> QueryBuilder::GetValueMap()
 	return valueMap;
 }
 
-std::pair<std::string, std::string>& QueryBuilder::GetWhere()
+std::pair<std::string, ValueType>& QueryBuilder::GetWhere()
 {
 	return m_where;
 }
@@ -176,19 +176,24 @@ bool QueryBuilder::SetQueryType(QueryType type)
 	return false;
 }
 
-const std::string QueryBuilder::Wrap(const std::string& value)
+const std::string QueryBuilder::Wrap(const ValueType& value)
 {
-	if (value.find(" as ") != 0)
+	if (value.m_value.find(" as ") != 0)
 	{
-		return value;
+		return value.m_value;
 	}
 
-	return WrapParts(StringUtility::Split(value, '.'));
+	return WrapParts(StringUtility::Split(value.m_value, '.'));
+}
+
+const std::string QueryBuilder::WrapParts(std::vector<ValueType>& parts)
+{
+	return StringUtility::Join(parts, ", ");
 }
 
 const std::string QueryBuilder::WrapParts(std::vector<std::string>& parts)
 {
-	return StringUtility::Join(parts, ',');
+	return StringUtility::Join(parts, ", ");
 }
 
 void QueryBuilder::Reset()
@@ -196,4 +201,5 @@ void QueryBuilder::Reset()
 	m_type = QueryType::None;
 	m_columns.clear();
 	m_values.clear();
+	m_where = {};
 }

@@ -4,11 +4,13 @@
 #include <string>
 #include <sstream>
 
+#include <fmt/format.h>
+
 namespace StringUtility
 {
-	static std::vector<std::string> Split(const std::string& string, char delimiter)
+	static std::vector<ValueType> Split(const std::string& string, char delimiter)
 	{
-		std::vector<std::string> segments;
+		std::vector<ValueType> segments;
 		std::string segment;
 		std::istringstream segmentStream(string);
 		while (std::getline(segmentStream, segment, delimiter))
@@ -18,7 +20,28 @@ namespace StringUtility
 		return segments;
 	}
 
-	static const std::string Join(std::vector<std::string>& vector, char glue)
+	static const std::string Join(std::vector<ValueType>& vector, const std::string& glue)
+	{
+		return[&vector, &glue]() -> const std::string {
+			std::string out;
+			bool first = true;
+			for (const ValueType& string : vector)
+			{
+				if (first)
+				{
+					out += fmt::format(string.m_wrap ? "'{}'" : "{}", string.m_value);
+					first = false;
+				}
+				else
+				{
+					out += glue + fmt::format(string.m_wrap ? "'{}'" : "{}", string.m_value);
+				}
+			}
+			return out;
+		}();
+	}
+
+	static const std::string Join(std::vector<std::string>& vector, const std::string& glue)
 	{
 		return[&vector, &glue]() -> const std::string {
 			std::string out;
@@ -27,12 +50,12 @@ namespace StringUtility
 			{
 				if (first)
 				{
-					out += string;
+					out += string.compare("*") == 0 ? string : "`" + string + "`";
 					first = false;
 				}
 				else
 				{
-					out += glue + string;
+					out += glue + (string.compare("*") == 0 ? string : "`" + string + "`");
 				}
 			}
 			return out;

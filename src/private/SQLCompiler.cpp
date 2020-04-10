@@ -26,11 +26,11 @@ std::string SQLCompiler::CompileInsert(QueryBuilder& query)
 
 std::string SQLCompiler::CompileUpdate(QueryBuilder& query)
 {
-	std::map<std::string, std::string> valueMap = query.GetValueMap();
+	std::map<std::string, ValueType> valueMap = query.GetValueMap();
 
 	std::string update = "";
 	bool first = true;
-	for (const std::pair<std::string, std::string> pair : valueMap)
+	for (const std::pair<std::string, ValueType> pair : valueMap)
 	{
 		if (first)
 		{
@@ -41,7 +41,7 @@ std::string SQLCompiler::CompileUpdate(QueryBuilder& query)
 			update += ", ";
 		}
 
-		update += pair.first + " = " + pair.second;
+		update += "`" + pair.first + "` = " + fmt::format(pair.second.m_wrap ? "'{}'" : "{}", pair.second.m_value);
 	}
 
 	return fmt::format("UPDATE {} SET {} {}", query.GetTable(), update, CompileWhere(query.GetWhere()));
@@ -52,7 +52,7 @@ std::string SQLCompiler::CompileDelete(QueryBuilder& query)
 	return fmt::format("DELETE FROM {} {}", query.GetTable(), CompileWhere(query.GetWhere()));
 }
 
-std::string SQLCompiler::CompileWhere(std::pair<std::string, std::string>& where)
+std::string SQLCompiler::CompileWhere(std::pair<std::string, ValueType>& where)
 {
-	return fmt::format("WHERE {} = {}", where.first, where.second);
+	return fmt::format("WHERE `{}` = {}", where.first, where.second.m_value);
 }
