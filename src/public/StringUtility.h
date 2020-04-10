@@ -38,4 +38,23 @@ namespace StringUtility
 			return out;
 		}();
 	}
+
+	static void GenerateKeyValue(std::map<std::string, std::string>& insertMap, std::string& outKey, std::string& outValue)
+	{
+		bool first = true;
+		for (std::map<std::string, std::string>::iterator it = insertMap.begin(); it != insertMap.end(); ++it)
+		{
+			if (first)
+			{
+				outKey += it->first;
+				outValue += it->second;
+				first = false;
+			}
+			else
+			{
+				outKey += ", " + it->first;
+				outValue += ", " + it->second;
+			}
+		}
+	}
 }

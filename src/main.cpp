@@ -17,6 +17,10 @@ void main()
 
 	printf("%s\n", DB::Table("test")->Select({ "hello", "world" })->Get().c_str());
 	printf("%s\n", DB::Table("test")->Select()->Get().c_str());
+	printf("%s\n", DB::Table("test")->Insert(std::vector<std::string>{"Hello", "World"})->Get().c_str());
+	printf("%s\n", DB::Table("test")->Insert(std::map<std::string, std::string>{ {"Hello", "World"}, {"Test 1", "Test 2"} })->Get().c_str());
+	printf("%s\n", DB::Table("test")->Update(std::map<std::string, std::string>{ {"Hello", "World"}, { "Test 1", "Test 2" } })->Where({ "ID", "1" })->Get().c_str());
+	printf("%s\n", DB::Table("test")->Delete()->Where({ "ID", "1" })->Get().c_str());
 
 	//db->Statement("CREATE TABLE test(ID INTEGER PRIMARY KEY AUTOINCREMENT, PATH INT NOT NULL, TYPE INT NOT NULL);");
 	/*

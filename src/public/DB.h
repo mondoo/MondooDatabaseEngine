@@ -34,8 +34,6 @@ private:
 	static int UpdateCallback(void* instance, int argc, char** argv, char** columnName);
 	static int DeleteCallback(void* instance, int argc, char** argv, char** columnName);
 
-	static void GenerateKeyValue(std::map<std::string, std::string>& insertMap, std::string& outKey, std::string& outValue);
-
 private:
 	static int m_insertIDOut;
 };

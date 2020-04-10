@@ -1,6 +1,7 @@
 #include "../public/DB.h"
 
 #include "../public/Table.h"
+#include "../public/StringUtility.h"
 
 int DB::m_insertIDOut = -1;
 
@@ -12,7 +13,7 @@ int DB::Insert(const std::string& table, std::map<std::string, std::string>& ins
 {
 	std::string key = "";
 	std::string value = "";
-	GenerateKeyValue(insertMap, key, value);
+	StringUtility::GenerateKeyValue(insertMap, key, value);
 
 	Statement(fmt::format("INSERT INTO {} ({}) VALUES ({}); SELECT last_insert_rowid();", table, key, value), InsertCallback);
 
@@ -49,23 +50,4 @@ int DB::UpdateCallback(void* instance, int argc, char** argv, char** columnName)
 int DB::DeleteCallback(void* instance, int argc, char** argv, char** columnName)
 {
 	return 0;
-}
-
-void DB::GenerateKeyValue(std::map<std::string, std::string>& insertMap, std::string& outKey, std::string& outValue)
-{
-	bool first = true;
-	for (std::map<std::string, std::string>::iterator it = insertMap.begin(); it != insertMap.end(); ++it)
-	{
-		if (first)
-		{
-			outKey += it->first;
-			outValue += it->second;
-			first = false;
-		}
-		else
-		{
-			outKey += ", " + it->first;
-			outValue += ", " + it->second;
-		}
-	}
 }
