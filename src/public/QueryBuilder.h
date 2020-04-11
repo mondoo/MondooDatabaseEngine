@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <initializer_list>
 
 #include "Types.h"
 
@@ -25,10 +26,9 @@ public:
 	template<typename... Args>
 	QueryBuilder* Insert(Args... args);
 
-	QueryBuilder* Insert(std::map<std::string, ValueType> values);
+	QueryBuilder* Insert(const std::vector<KeyValuePair>& values);
 	QueryBuilder* Insert(std::vector<ValueType> values);
-
-	QueryBuilder* Update(std::map<std::string, ValueType> values);
+	QueryBuilder* Update(const std::vector<KeyValuePair>& values);
 
 	QueryBuilder* Delete();
 
@@ -46,6 +46,7 @@ public:
 	std::pair<std::string, ValueType>& GetWhere();
 
 	std::string Get();
+	int Exec();
 
 private:
 	bool SetQueryType(QueryType type);

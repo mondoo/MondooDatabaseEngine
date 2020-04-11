@@ -22,6 +22,15 @@ int DB::Insert(const std::string& table, std::map<std::string, std::string>& ins
 	return insertIDOut;
 }
 
+int DB::Insert(const std::string& sql)
+{
+	Statement(sql + "SELECT last_insert_rowid();" , InsertCallback);
+
+	int insertIDOut = m_insertIDOut;
+	m_insertIDOut = -1;
+	return insertIDOut;
+}
+
 void DB::Statement(const std::string& statement, int (*callback)(void*, int, char**, char**) /* = NULL */)
 {
 	Exec(statement, callback);
@@ -32,11 +41,12 @@ DBTable* DB::Table(const std::string& table)
 	return new DBTable(table);
 }
 
-int DB::InsertCallback(void* instance, int argc, char** argv, char** columnName)
+int DB::InsertCallback(void* instance, int count, char** data, char** column)
 {
-	if (argc >= 0)
+	if (count >= 0)
 	{
-		m_insertIDOut = atoi(argv[0]);
+		printf("Last Insert ID: %s\n", data[0]);
+		m_insertIDOut = atoi(data[0]);
 		return 0;
 	}
 	return 1;

@@ -1,6 +1,7 @@
 #include "../public/QueryBuilder.h"
 #include "../public/StringUtility.h"
 #include "../public/SQLCompiler.h"
+#include "../public/DB.h"
 
 #include <stdio.h>
 #include <fmt/format.h>
@@ -29,17 +30,17 @@ QueryBuilder* QueryBuilder::Select(std::vector<std::string> columns /* = {} */)
 	return this;
 }
 
-QueryBuilder* QueryBuilder::Insert(std::map<std::string, ValueType> values)
+QueryBuilder* QueryBuilder::Insert(const std::vector<KeyValuePair>& values)
 {
 	if (SetQueryType(QueryType::Insert))
 	{
 		return this;
 	}
 
-	for (std::map<std::string, ValueType>::iterator it = values.begin(); it != values.end(); ++it)
+	for (const KeyValuePair& pair : values)
 	{
-		m_columns.push_back(it->first);
-		m_values.push_back(it->second);
+		m_columns.push_back(pair.m_key);
+		m_values.push_back(pair.m_value);
 	}
 
 	return this;
@@ -57,17 +58,17 @@ QueryBuilder* QueryBuilder::Insert(std::vector<ValueType> values)
 	return this;
 }
 
-QueryBuilder* QueryBuilder::Update(std::map<std::string, ValueType> values)
+QueryBuilder* QueryBuilder::Update(const std::vector<KeyValuePair>& values)
 {
 	if (SetQueryType(QueryType::Update))
 	{
 		return this;
 	}
 
-	for (std::map<std::string, ValueType>::iterator it = values.begin(); it != values.end(); ++it)
+	for (const KeyValuePair& pair : values)
 	{
-		m_columns.push_back(it->first);
-		m_values.push_back(it->second);
+		m_columns.push_back(pair.m_key);
+		m_values.push_back(pair.m_value);
 	}
 
 	return this;
@@ -157,10 +158,16 @@ std::string QueryBuilder::Get()
 		sql = SQLCompiler::CompileDelete(*this);
 		break;
 	default:
+		printf("No QueryType set");
 		return "";
 	}
 
-	return sql;
+	return sql + ";";
+}
+
+int QueryBuilder::Exec()
+{
+	return DB::Insert(Get());
 }
 
 bool QueryBuilder::SetQueryType(QueryType type)

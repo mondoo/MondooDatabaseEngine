@@ -18,6 +18,7 @@ public:
 	static void Select(Args... args);
 
 	static int Insert(const std::string& table, std::map<std::string, std::string>& insertMap);
+	static int Insert(const std::string& sql);
 
 	template<typename... Args>
 	static void Update(Args... args);
@@ -29,8 +30,8 @@ public:
 
 	static DBTable* Table(const std::string& table);
 
-private:
-	static int InsertCallback(void* instance, int argc, char** argv, char** columnName);
+	// Callbacks
+	static int InsertCallback(void* instance, int count, char** data, char** column);
 	static int UpdateCallback(void* instance, int argc, char** argv, char** columnName);
 	static int DeleteCallback(void* instance, int argc, char** argv, char** columnName);
 

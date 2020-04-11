@@ -2,6 +2,8 @@
 
 #include <string>
 #include <type_traits>
+#include <initializer_list>
+#include <vector>
 
 struct ValueType
 {
@@ -30,4 +32,24 @@ struct ValueType
 
 	std::string m_value;
 	bool m_wrap = true;
+};
+
+struct KeyValuePair
+{
+	KeyValuePair() = default;
+
+	template<typename T = ValueType>
+	KeyValuePair(const std::string& key, const T& value)
+		: m_key(key)
+		, m_value(ValueType(value))
+	{}
+
+	template<typename T = ValueType>
+	KeyValuePair(std::pair<const std::string, const T&> pair)
+		: m_key(pair.first)
+		, m_value(ValueType(pair.second))
+	{}
+
+	std::string m_key;
+	ValueType m_value;
 };
