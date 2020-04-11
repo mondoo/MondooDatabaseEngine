@@ -87,6 +87,7 @@ QueryBuilder* QueryBuilder::Delete()
 QueryBuilder* QueryBuilder::Where(std::pair<std::string, ValueType> values)
 {
 	m_where = values;
+	m_hasWhere = true;
 	return this;
 }
 
@@ -135,6 +136,11 @@ const std::map<std::string, ValueType> QueryBuilder::GetValueMap()
 	return valueMap;
 }
 
+bool QueryBuilder::HasWhere()
+{
+	return m_hasWhere;
+}
+
 std::pair<std::string, ValueType>& QueryBuilder::GetWhere()
 {
 	return m_where;
@@ -165,9 +171,25 @@ std::string QueryBuilder::Get()
 	return sql + ";";
 }
 
-int QueryBuilder::Exec()
+int QueryBuilder::Exec(int (*callback)(void*, int, char**, char**), void* objectPtr)
 {
-	return DB::Insert(Get());
+	switch (m_type)
+	{
+	case QueryType::Select:
+		if (callback != nullptr && objectPtr != nullptr)
+		{
+			DB::SelectFill(Get(), callback, objectPtr);
+		}
+		else
+		{
+			DB::Select(Get());
+		}
+		return 0;
+	case QueryType::Insert:
+		DB::Insert(Get());
+		return 0;
+	}
+	return 1;
 }
 
 bool QueryBuilder::SetQueryType(QueryType type)
@@ -209,4 +231,5 @@ void QueryBuilder::Reset()
 	m_columns.clear();
 	m_values.clear();
 	m_where = {};
+	m_hasWhere = false;
 }

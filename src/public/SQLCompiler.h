@@ -14,5 +14,5 @@ public:
 	static std::string CompileUpdate(QueryBuilder& query);
 	static std::string CompileDelete(QueryBuilder& query);
 
-	static std::string CompileWhere(std::pair<std::string, ValueType>& where);
+	static std::string CompileWhere(bool hasWhere, std::pair<std::string, ValueType>& where);
 };

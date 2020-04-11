@@ -31,7 +31,7 @@ void SQL::CloseDB()
 	sqlite3_close(m_db);
 }
 
-void SQL::Exec(const std::string& sql, int (*fn)(void*, int, char**, char**) /* = NULL */)
+void SQL::Exec(const std::string& sql, int (*fn)(void*, int, char**, char**), void* objectPtr)
 {
 	char* errorMsg = 0;
 	int response;
@@ -44,12 +44,11 @@ void SQL::Exec(const std::string& sql, int (*fn)(void*, int, char**, char**) /* 
 
 	if (fn)
 	{
-		typedef int function_t(void*, int, char**, char**);
-		response = sqlite3_exec(m_db, sql.c_str(), fn, 0, &errorMsg);
+		response = sqlite3_exec(m_db, sql.c_str(), fn, objectPtr, &errorMsg);
 	}
 	else
 	{
-		response = sqlite3_exec(m_db, sql.c_str(), NULL, 0, &errorMsg);
+		response = sqlite3_exec(m_db, sql.c_str(), NULL, objectPtr, &errorMsg);
 	}
 
 	if (response != SQLITE_OK)

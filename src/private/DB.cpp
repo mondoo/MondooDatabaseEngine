@@ -9,6 +9,16 @@ DB::DB(const std::string& database)
 	: SQL(database)
 {}
 
+void DB::Select(const std::string& sql)
+{
+	Statement(sql, SelectCallback);
+}
+
+void DB::SelectFill(const std::string& sql, int (*callback)(void*, int, char**, char**), void* objectPtr)
+{
+	Statement(sql, callback, objectPtr);
+}
+
 int DB::Insert(const std::string& table, std::map<std::string, std::string>& insertMap)
 {
 	std::string key = "";
@@ -31,9 +41,9 @@ int DB::Insert(const std::string& sql)
 	return insertIDOut;
 }
 
-void DB::Statement(const std::string& statement, int (*callback)(void*, int, char**, char**) /* = NULL */)
+void DB::Statement(const std::string& statement, int (*callback)(void*, int, char**, char**), void* objectPtr)
 {
-	Exec(statement, callback);
+	Exec(statement, callback, objectPtr);
 }
 
 DBTable* DB::Table(const std::string& table)
@@ -41,9 +51,30 @@ DBTable* DB::Table(const std::string& table)
 	return new DBTable(table);
 }
 
+int DB::SelectCallback(void* instance, int count, char** data, char** column)
+{
+	if (count > 0)
+	{
+		for (size_t i = 0; i < count; i++)
+		{
+			printf("| %s ", column[i]);
+		}
+		printf("\n");
+
+		for (size_t i = 0; i < count; i++)
+		{
+			printf("| %s ", data[i]);
+		}
+
+		printf("\n");
+		return 0;
+	}
+	return 1;
+}
+
 int DB::InsertCallback(void* instance, int count, char** data, char** column)
 {
-	if (count >= 0)
+	if (count > 0)
 	{
 		printf("Last Insert ID: %s\n", data[0]);
 		m_insertIDOut = atoi(data[0]);

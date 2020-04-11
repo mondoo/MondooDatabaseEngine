@@ -17,6 +17,10 @@ public:
 	template<typename... Args>
 	static void Select(Args... args);
 
+	static void Select(const std::string& sql);
+
+	static void SelectFill(const std::string& sql, int (*callback)(void*, int, char**, char**) = NULL, void* objectPtr = nullptr);
+
 	static int Insert(const std::string& table, std::map<std::string, std::string>& insertMap);
 	static int Insert(const std::string& sql);
 
@@ -26,11 +30,12 @@ public:
 	template<typename... Args>
 	static void Delete(Args... args);
 
-	static void Statement(const std::string& statement, int (*callback)(void*, int, char**, char**) = NULL);
+	static void Statement(const std::string& statement, int (*callback)(void*, int, char**, char**) = NULL, void* objectPtr = nullptr);
 
 	static DBTable* Table(const std::string& table);
 
 	// Callbacks
+	static int SelectCallback(void* instance, int count, char** data, char** column);
 	static int InsertCallback(void* instance, int count, char** data, char** column);
 	static int UpdateCallback(void* instance, int argc, char** argv, char** columnName);
 	static int DeleteCallback(void* instance, int argc, char** argv, char** columnName);
@@ -39,11 +44,10 @@ private:
 	static int m_insertIDOut;
 };
 
-
 template<typename... Args>
 inline void DB::Select(Args... args)
 {
-	Statement(fmt::format("SELECT * FROM {} WHERE {} = {}", args...));
+	Statement(fmt::format("SELECT * FROM {} WHERE {} = {}", args...), SelectCallback, this);
 }
 
 template<typename... Args>

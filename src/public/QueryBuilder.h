@@ -43,10 +43,11 @@ public:
 
 	const std::map<std::string, ValueType> GetValueMap();
 
+	bool HasWhere();
 	std::pair<std::string, ValueType>& GetWhere();
 
 	std::string Get();
-	int Exec();
+	int Exec(int (*callback)(void*, int, char**, char**) = nullptr, void* objectPtr = nullptr);
 
 private:
 	bool SetQueryType(QueryType type);
@@ -77,6 +78,7 @@ protected:
 	std::vector<std::string> m_columns = {};
 	std::vector<ValueType> m_values = {};
 
+	bool m_hasWhere = false;
 	std::pair<std::string, ValueType> m_where = {};
 
 	std::string m_table;

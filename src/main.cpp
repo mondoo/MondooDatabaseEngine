@@ -6,6 +6,52 @@
 
 #include "public/Types.h"
 
+struct TestTable
+{
+	TestTable() = default;
+
+	int m_id;
+	int m_path;
+	int m_type;
+
+	bool m_isValid = false;
+
+	static int Callback(void* out, int count, char** data, char** column)
+	{
+		if (count > 0)
+		{
+			TestTable* dataOut = (TestTable*)out;
+			
+			for (size_t i = 0; i < count; i++)
+			{
+				if (ColumnCheck(column[i], "ID"))
+				{
+					dataOut->m_id = atoi(data[i]);
+				}
+				else if (ColumnCheck(column[i], "PATH"))
+				{
+					dataOut->m_path = atoi(data[i]);
+				}
+				else if (ColumnCheck(column[i], "TYPE"))
+				{
+					dataOut->m_type = atoi(data[i]);
+				}
+			}
+
+			dataOut->m_isValid = true;
+
+			return 0;
+		}
+		return 1;
+	}
+
+private:
+	static bool ColumnCheck(char* column, char* key)
+	{
+		return strcmp(column, key) == 0;
+	}
+};
+
 void main()
 {
 	DB* db = new DB("test.db");
@@ -27,6 +73,22 @@ void main()
 	})->Where({ "ID", ValueType("1") })->Get().c_str());
 
 	printf("%s\n", DB::Table("test")->Delete()->Where({ "ID", ValueType("1", false) })->Get().c_str());
+
+	printf("==== SELECT TESTS ====\n");
+
+	DB::Table("test")->Select()->Exec();
+	DB::Table("test")->Select({"PATH", "TYPE"})->Exec();
+	printf("%s\n", DB::Table("test")->Select({ "PATH", "TYPE" })->Get().c_str());
+
+	TestTable output;
+	printf(DB::Table("test")->Select()->Where({ "ID", ValueType("100", false) })->Get().c_str());
+	DB::Table("test")->Select()->Where({ "ID", ValueType("100", false) })->Exec(output.Callback, &output);
+	if (output.m_isValid)
+	{
+		printf("ID: %i, PATH: %i, TYPE: %i\n", output.m_id, output.m_path, output.m_type);
+	}
+
+	printf("\n");
 
 	printf("==== INSERT TESTS ====\n");
 	DB::Table("test")->Insert(std::vector<KeyValuePair>{

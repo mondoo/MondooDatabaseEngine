@@ -15,7 +15,7 @@ public:
 
 	void CloseDB();
 
-	static void Exec(const std::string& sql, int (*fn)(void*, int, char**, char**) = NULL);
+	static void Exec(const std::string& sql, int (*fn)(void*, int, char**, char**) = NULL, void* objectPtr = nullptr);
 
 private:
 	static void PrintError(const char* Msg, const char* errMsg);

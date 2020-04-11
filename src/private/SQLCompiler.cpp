@@ -7,7 +7,7 @@
 
 std::string SQLCompiler::CompileSelect(QueryBuilder& query)
 {
-	return fmt::format("SELECT {} FROM {}", query.GetColumns(), query.GetTable());
+	return fmt::format("SELECT {} FROM {}{}", query.GetColumns(), query.GetTable(), CompileWhere(query.HasWhere(), query.GetWhere()));
 }
 
 std::string SQLCompiler::CompileInsert(QueryBuilder& query)
@@ -44,15 +44,15 @@ std::string SQLCompiler::CompileUpdate(QueryBuilder& query)
 		update += "`" + pair.first + "` = " + fmt::format(pair.second.m_wrap ? "'{}'" : "{}", pair.second.m_value);
 	}
 
-	return fmt::format("UPDATE {} SET {} {}", query.GetTable(), update, CompileWhere(query.GetWhere()));
+	return fmt::format("UPDATE {} SET {}{}", query.GetTable(), update, CompileWhere(query.HasWhere(), query.GetWhere()));
 }
 
 std::string SQLCompiler::CompileDelete(QueryBuilder& query)
 {
-	return fmt::format("DELETE FROM {} {}", query.GetTable(), CompileWhere(query.GetWhere()));
+	return fmt::format("DELETE FROM {}{}", query.GetTable(), CompileWhere(query.HasWhere(), query.GetWhere()));
 }
 
-std::string SQLCompiler::CompileWhere(std::pair<std::string, ValueType>& where)
+std::string SQLCompiler::CompileWhere(bool hasWhere, std::pair<std::string, ValueType>& where)
 {
-	return fmt::format("WHERE `{}` = {}", where.first, where.second.m_value);
+	return hasWhere ? fmt::format(" WHERE `{}` = {}", where.first, where.second.m_value) : "";
 }
