@@ -3,54 +3,12 @@
 #include "public/Table.h"
 #include <stdio.h>
 #include <map>
+#include <unordered_map>
 
+#include "public/Reflection.h"
 #include "public/Types.h"
 
-struct TestTable
-{
-	TestTable() = default;
-
-	int m_id;
-	int m_path;
-	int m_type;
-
-	bool m_isValid = false;
-
-	static int Callback(void* out, int count, char** data, char** column)
-	{
-		if (count > 0)
-		{
-			TestTable* dataOut = (TestTable*)out;
-			
-			for (size_t i = 0; i < count; i++)
-			{
-				if (ColumnCheck(column[i], "ID"))
-				{
-					dataOut->m_id = atoi(data[i]);
-				}
-				else if (ColumnCheck(column[i], "PATH"))
-				{
-					dataOut->m_path = atoi(data[i]);
-				}
-				else if (ColumnCheck(column[i], "TYPE"))
-				{
-					dataOut->m_type = atoi(data[i]);
-				}
-			}
-
-			dataOut->m_isValid = true;
-
-			return 0;
-		}
-		return 1;
-	}
-
-private:
-	static bool ColumnCheck(char* column, char* key)
-	{
-		return strcmp(column, key) == 0;
-	}
-};
+std::unordered_map<std::string, Reflection::Struct*> Reflection::StructHelpers::s_typeMaps;
 
 void main()
 {
@@ -81,11 +39,14 @@ void main()
 	printf("%s\n", DB::Table("test")->Select({ "PATH", "TYPE" })->Get().c_str());
 
 	TestTable output;
-	printf(DB::Table("test")->Select()->Where({ "ID", ValueType("100", false) })->Get().c_str());
-	DB::Table("test")->Select()->Where({ "ID", ValueType("100", false) })->Exec(output.Callback, &output);
+	output.Initialise();
+	output.InitStruct();
+
+	printf(DB::Table("test")->Select()->Where({ "ID", ValueType("900", false) })->Get().c_str());
+	DB::Table("test")->Select()->Where({ "ID", ValueType("900", false) })->Exec(output.Callback, &output);
 	if (output.m_isValid)
 	{
-		printf("ID: %i, PATH: %i, TYPE: %i\n", output.m_id, output.m_path, output.m_type);
+		printf("\nID: %i, PATH: %i, TYPE: %i\n", output.ID, output.PATH, output.TYPE);
 	}
 
 	printf("\n");

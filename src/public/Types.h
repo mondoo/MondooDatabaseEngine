@@ -5,6 +5,8 @@
 #include <initializer_list>
 #include <vector>
 
+#include "Reflection.h"
+
 struct ValueType
 {
 	template<typename T, std::enable_if_t<std::is_convertible<T, std::string>::value> = 0>
@@ -52,4 +54,36 @@ struct KeyValuePair
 
 	std::string m_key;
 	ValueType m_value;
+};
+
+struct TestTable
+{
+	TestTable() = default;
+
+	MODELSTRUCT(TestTable);
+
+	int ID;
+	int PATH;
+	int TYPE;
+
+	bool m_isValid = false;
+
+	void InitStruct()
+	{
+		MODELSTRUCTMEMBER(TestTable, int32_t, ID);
+		MODELSTRUCTMEMBER(TestTable, int32_t, PATH);
+		MODELSTRUCTMEMBER(TestTable, int32_t, TYPE);
+	}
+
+	MODELCALLBACK(TestTable)
+		MODELCALLBACKBODY(int32_t, ID);
+		MODELCALLBACKBODY(int32_t, PATH);
+		MODELCALLBACKBODY(int32_t, TYPE);
+	MODELCALLBACKEND
+
+private:
+	static bool ColumnCheck(char* column, char* key)
+	{
+		return strcmp(column, key) == 0;
+	}
 };
