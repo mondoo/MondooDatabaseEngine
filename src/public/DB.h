@@ -24,8 +24,6 @@ public:
 	static int Insert(const std::string& table, std::map<std::string, std::string>& insertMap);
 	static int Insert(const std::string& sql);
 
-	static void Update(const std::string& sql);
-
 	template<typename... Args>
 	static void Update(Args... args);
 
