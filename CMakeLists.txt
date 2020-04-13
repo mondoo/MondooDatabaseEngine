@@ -35,7 +35,6 @@ target_include_directories(
 	PRIVATE
 		${SQLITE_DIR} sqlite3
 		${FMT_DIR}/include fmt
-		${VENDOR_DIR}/reflection reflection
 		src/public
 		src/private
 )
