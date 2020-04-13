@@ -4,12 +4,13 @@
 #include <unordered_map>
 #include <string>
 #include <type_traits>
+#include <sstream>
 
 #include "Types.h"
 
 #define MODELSTRUCTMEMBER(modelStruct, type, name)																												\
 if (Reflection::Struct* structMap = Reflection::StructHelpers::_getStruct(#modelStruct)) {																		\
-	structMap->_insertStructMapItem(#name, new Reflection::MemberTypePair(Reflection::MemberType::Type##type, (size_t)offsetof(struct modelStruct, name) ));	\
+	structMap->InsertStructMapItem(#name, new Reflection::MemberTypePair(Reflection::MemberType::Type##type, (size_t)offsetof(struct modelStruct, name) ));	\
 }
 
 #define MODELCALLBACK(modelStruct)																						\
@@ -22,7 +23,7 @@ static int Callback(void* out, int count, char** data, char** column){										
 #define MODELCALLBACKBODY(type, columnName)																				\
 			if (strcmp(#columnName, column[i]) == 0) {																	\
 				if (type* member = Reflection::Struct::GetStructMember<type>(dataOut, column[i])) {						\
-					Reflection::Struct::ModelCastType(*member, data[i]); continue;									\
+					Reflection::ModelMemberHelpers::LexicalCast(*member, data[i]); continue;							\
 				}																										\
 			}
 
@@ -49,7 +50,9 @@ namespace Reflection
 		Typeuint32_t,
 		Typeuint64_t,
 		Typebool,
-		Typestring
+		Typestring,
+		Typefloat,
+		Typedouble
 	};
 
 	struct MemberTypePair
@@ -82,7 +85,8 @@ namespace Reflection
 		Struct() = default;
 
 		std::map<std::string, MemberTypePair*> s_structMap;
-		void _insertStructMapItem(std::string key, MemberTypePair* value)
+
+		void InsertStructMapItem(std::string key, MemberTypePair* value)
 		{
 			s_structMap.insert_or_assign(key, value);
 		}
@@ -90,7 +94,7 @@ namespace Reflection
 		template<typename valueType, typename structType>
 		static valueType* GetStructMember(structType* modelStruct, const std::string& member)
 		{
- 			if (Struct* foundStruct = StructHelpers::_getStruct(modelStruct->m_structType))
+			if (Struct* foundStruct = StructHelpers::_getStruct(modelStruct->m_structType))
 			{
 				return _getStructMember<valueType>(modelStruct, member, foundStruct->s_structMap);
 			}
@@ -98,6 +102,7 @@ namespace Reflection
 			return nullptr;
 		}
 
+	private:
 		template<typename valueType, typename structType>
 		static valueType* _getStructMember(structType* modelStruct, std::string member, std::map<std::string, MemberTypePair*>& map)
 		{
@@ -110,16 +115,6 @@ namespace Reflection
 				valueType* str = MemberTypeData<valueType>::GetMember(modelStruct, map[member]->m_offset);
 				return str;
 			}
-		}
-
-		static void ModelCastType(int32_t& member, char* data)
-		{
-			member = (int32_t)atoi(data);
-		}
-
-		static void ModelCastType(std::string& member, char* data)
-		{
-			member = data != NULL ? std::string(data) : "";
 		}
 	};
 
@@ -144,5 +139,21 @@ namespace Reflection
 		}
 
 		static std::unordered_map<std::string, Struct*> s_typeMaps;
+	};
+
+	class ModelMemberHelpers
+	{
+	public:
+		template<typename To, typename From>
+		static void LexicalCast(To& outVal, const From* from)
+		{
+			if (from != NULL)
+			{
+				std::stringstream sstream;
+
+				sstream << from;
+				sstream >> outVal;
+			}
+		}
 	};
 }

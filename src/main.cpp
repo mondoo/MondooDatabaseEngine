@@ -5,6 +5,11 @@
 #include <map>
 #include <unordered_map>
 
+#include <fmt/format.h>
+#include <string>
+#include <time.h>
+#include <iostream>
+
 #include "public/Reflection.h"
 #include "public/Types.h"
 
@@ -38,34 +43,42 @@ void main()
 	DB::Table("test")->Select({"PATH", "TYPE"})->Exec();
 	printf("%s\n", DB::Table("test")->Select({ "PATH", "TYPE" })->Get().c_str());
 
-	printf(DB::Table("test")->Select()->Where({ "ID", ValueType("900", false) })->Get().c_str());
-	for (int i = 1000; i < 1152; i++)
-	{
-		TestTable output;
-		DB::Table("test")->Select()->Where({ "ID", ValueType(i, false) })->Exec(output.Callback, &output);
-		if (output.m_isValid)
-		{
-			printf("\nID: %i, PATH: %i, TYPE: %i, STRING: %s\n", output.ID, output.PATH, output.TYPE, output.STRING.c_str());
-		}
-	}
-
-	printf("\n");
-
 	printf("==== INSERT TESTS ====\n");
-	DB::Table("test")->Insert(std::vector<KeyValuePair>{
-		{ "PATH", 0 },
-		{ "TYPE", 1 },
-		{ "STRING", "Hello World" }
-	})->Exec();
-
 	for (size_t i = 0; i < 10; i++)
 	{
 		DB::Table("test")->Insert(std::vector<KeyValuePair>{
 			{ "PATH", 0 },
 			{ "TYPE", 1 },
-			{ "STRING", "XYZ" }
+			{ "STRING", "XYZ" },
+			{ "BOOL", true },
+			{ "DOUBLE", 0.66798 },
+			{ "FLOAT", 1.345f }
+		})->Exec();
+
+		DB::Table("test")->Insert(std::vector<KeyValuePair>{
+			{ "PATH", 120 },
+			{ "TYPE", 0 },
+			{ "STRING", "ABC" },
+			{ "BOOL", false },
+			{ "DOUBLE", 201.567722 },
+			{ "FLOAT", 12.7745f }
 		})->Exec();
 	}
-	
-	printf("\n");
+
+	printf("==== MODEL TESTS ====\n");
+	printf(DB::Table("test")->Select()->Where({ "ID", ValueType("900", false) })->Get().c_str());
+	for (int i = 0; i < 20; i++)
+	{
+		clock_t begin = clock();
+		TestTable output;
+		DB::Table("test")->Select()->Where({ "ID", ValueType(i, false) })->Exec(output.Callback, &output);
+		if (output.m_isValid)
+		{
+			std::cout << fmt::format("\n\n==========\n\n ID | {}\n PATH | {}\n TYPE | {}\n STRING | {}\n BOOL | {}\n DOUBLE | {}\n FLOAT | {}\n",
+				output.ID, output.PATH, output.TYPE, output.STRING.c_str(), output.BOOL ? "TRUE" : "FALSE", output.DOUBLE, output.FLOAT) << std::endl;
+			clock_t end = clock();
+			double duration = (double)(end - begin) / CLOCKS_PER_SEC;
+			std::cout << "Execution Time: " << duration << "ms" << "\n\n==========\n" << std::endl;
+		}
+	}
 }

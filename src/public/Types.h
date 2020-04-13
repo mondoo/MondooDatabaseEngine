@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <initializer_list>
 #include <vector>
+#include <stdio.h>
 
 #include "Reflection.h"
 
@@ -19,6 +20,16 @@ struct ValueType
 	{}
 
 	ValueType(int value, bool wrap = false)
+		: m_value(std::to_string(value))
+		, m_wrap(wrap)
+	{}
+
+	ValueType(double value, bool wrap = false)
+		: m_value(std::to_string(value))
+		, m_wrap(wrap)
+	{}
+
+	ValueType(float value, bool wrap = false)
 		: m_value(std::to_string(value))
 		, m_wrap(wrap)
 	{}
@@ -57,6 +68,9 @@ struct TestTable
 	int PATH;
 	int TYPE;
 	std::string STRING;
+	bool BOOL;
+	double DOUBLE;
+	float FLOAT;
 
 	bool m_isValid = false;
 
@@ -66,6 +80,9 @@ struct TestTable
 		MODELSTRUCTMEMBER(TestTable, int32_t, PATH);
 		MODELSTRUCTMEMBER(TestTable, int32_t, TYPE);
 		MODELSTRUCTMEMBER(TestTable, string, STRING);
+		MODELSTRUCTMEMBER(TestTable, bool, BOOL);
+		MODELSTRUCTMEMBER(TestTable, double, DOUBLE);
+		MODELSTRUCTMEMBER(TestTable, float, FLOAT);
 	}
 
 	MODELCALLBACK(TestTable)
@@ -73,5 +90,8 @@ struct TestTable
 		MODELCALLBACKBODY(int32_t, PATH);
 		MODELCALLBACKBODY(int32_t, TYPE);
 		MODELCALLBACKBODY(string, STRING);
+		MODELCALLBACKBODY(bool, BOOL);
+		MODELCALLBACKBODY(double, DOUBLE);
+		MODELCALLBACKBODY(float, FLOAT);
 	MODELCALLBACKEND
 };
