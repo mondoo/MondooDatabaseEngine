@@ -1,4 +1,4 @@
-#include "../public/SQL.h"
+#include "SQL.h"
 #include <sqlite3.h>
 
 sqlite3* SQL::m_db;

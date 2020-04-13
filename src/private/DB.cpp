@@ -1,7 +1,7 @@
-#include "../public/DB.h"
+#include "DB.h"
 
-#include "../public/Table.h"
-#include "../public/StringUtility.h"
+#include "Table.h"
+#include "StringUtility.h"
 
 int DB::m_insertIDOut = -1;
 

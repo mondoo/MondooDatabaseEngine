@@ -1,11 +1,9 @@
 #pragma once
 
-
 #include <unordered_map>
 #include <vector>
 #include <string>
 #include <map>
-#include <initializer_list>
 
 #include "Types.h"
 

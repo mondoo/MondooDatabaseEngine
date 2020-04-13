@@ -1,5 +1,5 @@
-#include "../public/Table.h"
-#include "../public/DB.h"
+#include "Table.h"
+#include "DB.h"
 
 DBTable::DBTable(const std::string& table)
 {

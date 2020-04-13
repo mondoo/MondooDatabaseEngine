@@ -1,9 +1,9 @@
-#include "../public/SQLCompiler.h"
+#include "SQLCompiler.h"
 
 #include <fmt/format.h>
 
-#include "../public/Table.h"
-#include "../public/QueryBuilder.h"
+#include "Table.h"
+#include "QueryBuilder.h"
 
 std::string SQLCompiler::CompileSelect(QueryBuilder& query)
 {

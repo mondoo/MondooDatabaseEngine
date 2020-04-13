@@ -1,7 +1,7 @@
-#include "../public/QueryBuilder.h"
-#include "../public/StringUtility.h"
-#include "../public/SQLCompiler.h"
-#include "../public/DB.h"
+#include "QueryBuilder.h"
+#include "StringUtility.h"
+#include "SQLCompiler.h"
+#include "DB.h"
 
 #include <stdio.h>
 #include <fmt/format.h>
