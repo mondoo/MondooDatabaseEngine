@@ -75,7 +75,6 @@ namespace Reflection
 		static T* GetMember(void* data, size_t offset)
 		{
 			return reinterpret_cast<T*>(((size_t)data) + offset);
-			//return (T*)(((size_t)data) + offset);
 		}
 	};
 

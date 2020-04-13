@@ -146,7 +146,7 @@ std::pair<std::string, ValueType>& QueryBuilder::GetWhere()
 	return m_where;
 }
 
-std::string QueryBuilder::Get()
+std::string QueryBuilder::GetStatement()
 {
 	std::string sql;
 	switch (m_type)
@@ -171,22 +171,22 @@ std::string QueryBuilder::Get()
 	return sql + ";";
 }
 
-int QueryBuilder::Exec(int (*callback)(void*, int, char**, char**), void* objectPtr)
+int QueryBuilder::ExecStatement(int (*callback)(void*, int, char**, char**), void* objectPtr)
 {
 	switch (m_type)
 	{
 	case QueryType::Select:
 		if (callback != nullptr && objectPtr != nullptr)
 		{
-			DB::SelectFill(Get(), callback, objectPtr);
+			DB::SelectFill(GetStatement(), callback, objectPtr);
 		}
 		else
 		{
-			DB::Select(Get());
+			DB::Select(GetStatement());
 		}
 		return 0;
 	case QueryType::Insert:
-		DB::Insert(Get());
+		DB::Insert(GetStatement());
 		return 0;
 	}
 	return 1;

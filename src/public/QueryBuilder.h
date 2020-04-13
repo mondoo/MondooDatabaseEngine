@@ -46,8 +46,8 @@ public:
 	bool HasWhere();
 	std::pair<std::string, ValueType>& GetWhere();
 
-	std::string Get();
-	int Exec(int (*callback)(void*, int, char**, char**) = nullptr, void* objectPtr = nullptr);
+	std::string GetStatement();
+	int ExecStatement(int (*callback)(void*, int, char**, char**) = nullptr, void* objectPtr = nullptr);
 
 private:
 	bool SetQueryType(QueryType type);

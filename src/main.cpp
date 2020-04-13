@@ -19,29 +19,29 @@ void main()
 {
 	DB* db = new DB("test.db");
 
-	printf("%s\n", DB::Table("test")->Select({ "hello", "world" })->Get().c_str());
-	printf("%s\n", DB::Table("test")->Select()->Get().c_str());
+	printf("%s\n", DB::Table("test")->Select({ "hello", "world" })->GetStatement().c_str());
+	printf("%s\n", DB::Table("test")->Select()->GetStatement().c_str());
 
-	printf("%s\n", DB::Table("test")->Insert("Hello", 1, "World", 5031)->Get().c_str());
-	printf("%s\n", DB::Table("test")->Insert(std::vector<ValueType>{ValueType("Hello"), ValueType(1)})->Get().c_str());
+	printf("%s\n", DB::Table("test")->Insert("Hello", 1, "World", 5031)->GetStatement().c_str());
+	printf("%s\n", DB::Table("test")->Insert(std::vector<ValueType>{ValueType("Hello"), ValueType(1)})->GetStatement().c_str());
 	printf("%s\n", DB::Table("test")->Insert(std::vector<KeyValuePair>{
 		{"Hello", "World"},
 		{"Test 1", "Test 2"},
 		{"Test 2", 10}
-	})->Get().c_str());
+	})->GetStatement().c_str());
 
 	printf("%s\n", DB::Table("test")->Update(std::vector<KeyValuePair>{
 		{"Hello", "World"},
 		{ "Test 1", "Test 2" }
-	})->Where({ "ID", ValueType("1") })->Get().c_str());
+	})->Where({ "ID", ValueType("1") })->GetStatement().c_str());
 
-	printf("%s\n", DB::Table("test")->Delete()->Where({ "ID", ValueType("1", false) })->Get().c_str());
+	printf("%s\n", DB::Table("test")->Delete()->Where({ "ID", ValueType("1", false) })->GetStatement().c_str());
 
 	printf("==== SELECT TESTS ====\n");
 
-	DB::Table("test")->Select()->Exec();
-	DB::Table("test")->Select({"PATH", "TYPE"})->Exec();
-	printf("%s\n", DB::Table("test")->Select({ "PATH", "TYPE" })->Get().c_str());
+	DB::Table("test")->Select()->ExecStatement();
+	DB::Table("test")->Select({"PATH", "TYPE"})->ExecStatement();
+	printf("%s\n", DB::Table("test")->Select({ "PATH", "TYPE" })->GetStatement().c_str());
 
 	printf("==== INSERT TESTS ====\n");
 	for (size_t i = 0; i < 10; i++)
@@ -53,7 +53,7 @@ void main()
 			{ "BOOL", true },
 			{ "DOUBLE", 0.66798 },
 			{ "FLOAT", 1.345f }
-		})->Exec();
+		})->ExecStatement();
 
 		DB::Table("test")->Insert(std::vector<KeyValuePair>{
 			{ "PATH", 120 },
@@ -62,16 +62,16 @@ void main()
 			{ "BOOL", false },
 			{ "DOUBLE", 201.567722 },
 			{ "FLOAT", 12.7745f }
-		})->Exec();
+		})->ExecStatement();
 	}
 
 	printf("==== MODEL TESTS ====\n");
-	printf(DB::Table("test")->Select()->Where({ "ID", ValueType("900", false) })->Get().c_str());
+	printf(DB::Table("test")->Select()->Where({ "ID", ValueType("900", false) })->GetStatement().c_str());
 	for (int i = 0; i < 20; i++)
 	{
 		clock_t begin = clock();
 		TestTable output;
-		DB::Table("test")->Select()->Where({ "ID", ValueType(i, false) })->Exec(output.Callback, &output);
+		DB::Table("test")->Select()->Where({ "ID", ValueType(i, false) })->ExecStatement(output.Callback, &output);
 		if (output.m_isValid)
 		{
 			std::cout << fmt::format("\n\n==========\n\n ID | {}\n PATH | {}\n TYPE | {}\n STRING | {}\n BOOL | {}\n DOUBLE | {}\n FLOAT | {}\n",
