@@ -9,24 +9,17 @@
 
 struct ValueType
 {
-	template<typename T, std::enable_if_t<std::is_convertible<T, std::string>::value> = 0>
-	ValueType(const T& value)
-		: m_value(std::string(value))
-	{}
-
-	template<typename T, std::enable_if_t<std::is_arithmetic<T>::value, int> = 0>
-	ValueType(const T& value)
-		: m_value(std::to_string(value))
-		, m_wrap(false)
-	{}
-
-
 	ValueType(const std::string& value)
 		: m_value(value)
 	{}
 
 	ValueType(const std::string& value, bool wrap)
 		: m_value(value)
+		, m_wrap(wrap)
+	{}
+
+	ValueType(int value, bool wrap = false)
+		: m_value(std::to_string(value))
 		, m_wrap(wrap)
 	{}
 
@@ -58,13 +51,12 @@ struct KeyValuePair
 
 struct TestTable
 {
-	TestTable() = default;
-
 	MODELSTRUCT(TestTable);
 
 	int ID;
 	int PATH;
 	int TYPE;
+	std::string STRING;
 
 	bool m_isValid = false;
 
@@ -73,17 +65,13 @@ struct TestTable
 		MODELSTRUCTMEMBER(TestTable, int32_t, ID);
 		MODELSTRUCTMEMBER(TestTable, int32_t, PATH);
 		MODELSTRUCTMEMBER(TestTable, int32_t, TYPE);
+		MODELSTRUCTMEMBER(TestTable, string, STRING);
 	}
 
 	MODELCALLBACK(TestTable)
 		MODELCALLBACKBODY(int32_t, ID);
 		MODELCALLBACKBODY(int32_t, PATH);
 		MODELCALLBACKBODY(int32_t, TYPE);
+		MODELCALLBACKBODY(string, STRING);
 	MODELCALLBACKEND
-
-private:
-	static bool ColumnCheck(char* column, char* key)
-	{
-		return strcmp(column, key) == 0;
-	}
 };

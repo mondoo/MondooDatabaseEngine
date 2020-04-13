@@ -3,6 +3,7 @@
 #include <map>
 #include <unordered_map>
 #include <string>
+#include <type_traits>
 
 #include "Types.h"
 
@@ -15,15 +16,15 @@ if (Reflection::Struct* structMap = Reflection::StructHelpers::_getStruct(#model
 static int Callback(void* out, int count, char** data, char** column){													\
 	if (count > 0){																										\
 		modelStruct* dataOut = (modelStruct*)out;																		\
-		for (size_t i = 0; i < count; i++) {																			\
+		for (size_t i = 0; i < count; i++) {
 
 
 #define MODELCALLBACKBODY(type, columnName)																				\
-			if (strcmp(#columnName, column[i]) != 0) {																	\
+			if (strcmp(#columnName, column[i]) == 0) {																	\
 				if (type* member = Reflection::Struct::GetStructMember<type>(dataOut, column[i])) {						\
-					*member = (type)atoi(data[i]); continue;																	\
+					Reflection::Struct::ModelCastType(*member, data[i]); continue;									\
 				}																										\
-			}																											\
+			}
 
 #define MODELCALLBACKEND																								\
 		}																												\
@@ -31,28 +32,24 @@ static int Callback(void* out, int count, char** data, char** column){										
 		return 0;																										\
 	}																													\
 	return 1;																											\
-}																														\
-
+}
 
 #define MODELSTRUCT(modelStruct)																						\
+typedef std::string string;																								\
+modelStruct() { Initialise(); InitStruct(); }																			\
 std::string m_structType = #modelStruct;																				\
 void Initialise() { Reflection::StructHelpers::_insertStruct(#modelStruct); }
-
 
 namespace Reflection
 {
 	enum class MemberType : uint8_t
 	{
-		Typeint8_t,
-		Typeint16_t,
 		Typeint32_t,
 		Typeint64_t,
-		Typeuint8_t,
-		Typeuint16_t,
 		Typeuint32_t,
 		Typeuint64_t,
 		Typebool,
-		TypeString
+		Typestring
 	};
 
 	struct MemberTypePair
@@ -75,6 +72,7 @@ namespace Reflection
 		static T* GetMember(void* data, size_t offset)
 		{
 			return reinterpret_cast<T*>(((size_t)data) + offset);
+			//return (T*)(((size_t)data) + offset);
 		}
 	};
 
@@ -109,8 +107,19 @@ namespace Reflection
 			}
 			else
 			{
-				return MemberTypeData<valueType>::GetMember(modelStruct, map[member]->m_offset);
+				valueType* str = MemberTypeData<valueType>::GetMember(modelStruct, map[member]->m_offset);
+				return str;
 			}
+		}
+
+		static void ModelCastType(int32_t& member, char* data)
+		{
+			member = (int32_t)atoi(data);
+		}
+
+		static void ModelCastType(std::string& member, char* data)
+		{
+			member = data != NULL ? std::string(data) : "";
 		}
 	};
 

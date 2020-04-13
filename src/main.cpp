@@ -38,15 +38,15 @@ void main()
 	DB::Table("test")->Select({"PATH", "TYPE"})->Exec();
 	printf("%s\n", DB::Table("test")->Select({ "PATH", "TYPE" })->Get().c_str());
 
-	TestTable output;
-	output.Initialise();
-	output.InitStruct();
-
 	printf(DB::Table("test")->Select()->Where({ "ID", ValueType("900", false) })->Get().c_str());
-	DB::Table("test")->Select()->Where({ "ID", ValueType("900", false) })->Exec(output.Callback, &output);
-	if (output.m_isValid)
+	for (int i = 1000; i < 1152; i++)
 	{
-		printf("\nID: %i, PATH: %i, TYPE: %i\n", output.ID, output.PATH, output.TYPE);
+		TestTable output;
+		DB::Table("test")->Select()->Where({ "ID", ValueType(i, false) })->Exec(output.Callback, &output);
+		if (output.m_isValid)
+		{
+			printf("\nID: %i, PATH: %i, TYPE: %i, STRING: %s\n", output.ID, output.PATH, output.TYPE, output.STRING.c_str());
+		}
 	}
 
 	printf("\n");
@@ -54,26 +54,18 @@ void main()
 	printf("==== INSERT TESTS ====\n");
 	DB::Table("test")->Insert(std::vector<KeyValuePair>{
 		{ "PATH", 0 },
-		{ "TYPE", 1 }
+		{ "TYPE", 1 },
+		{ "STRING", "Hello World" }
 	})->Exec();
 
 	for (size_t i = 0; i < 10; i++)
 	{
 		DB::Table("test")->Insert(std::vector<KeyValuePair>{
 			{ "PATH", 0 },
-			{ "TYPE", 1 }
+			{ "TYPE", 1 },
+			{ "STRING", "XYZ" }
 		})->Exec();
 	}
-
+	
 	printf("\n");
-
-	//db->Statement("CREATE TABLE test(ID INTEGER PRIMARY KEY AUTOINCREMENT, PATH INT NOT NULL, TYPE INT NOT NULL);");
-	/*
-	int lastInsert = DB::Insert("test",	std::map<std::string, std::string>{
-		{"PATH", "2"},
-		{"TYPE", "3"}
-	});
-	*/
-
-	//printf("New Row in Table: %i\n", lastInsert);
 }
