@@ -145,6 +145,15 @@ namespace Reflection
 	class ModelMemberHelpers
 	{
 	public:
+		template<typename From>
+		static void LexicalCast(std::string& outVal, const From* from)
+		{
+			if (from != NULL)
+			{
+				outVal = from;
+			}
+		}
+		
 		template<typename To, typename From>
 		static void LexicalCast(To& outVal, const From* from)
 		{

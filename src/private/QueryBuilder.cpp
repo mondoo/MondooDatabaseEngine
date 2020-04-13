@@ -188,7 +188,7 @@ std::string QueryBuilder::GetStatement()
 	return sql + ";";
 }
 
-void QueryBuilder::ExecStatement(int (*callback)(void*, int, char**, char**), void* objectPtr, bool printStatement)
+void QueryBuilder::ExecStatement(bool printStatement, int (*callback)(void*, int, char**, char**), void* objectPtr)
 {
 	const std::string statement = GetStatement();
 
@@ -207,11 +207,14 @@ void QueryBuilder::ExecStatement(int (*callback)(void*, int, char**, char**), vo
 	case QueryType::Insert:
 		DB::Insert(statement);
 		break;
+	case QueryType::Update:
+	case QueryType::Delete:
+		DB::Statement(statement);
 	}
 
 	if (printStatement)
 	{
-		printf(fmt::format("Executed Statement: {}", statement).c_str());
+		printf(fmt::format("Executed Statement: {}\n", statement).c_str());
 	}
 }
 

@@ -49,7 +49,7 @@ public:
 
 	std::string GetStatement();
 
-	void ExecStatement(int (*callback)(void*, int, char**, char**) = nullptr, void* objectPtr = nullptr, bool printStatement = false);
+	void ExecStatement(bool printStatement = false, int (*callback)(void*, int, char**, char**) = nullptr, void* objectPtr = nullptr);
 
 private:
 	bool SetQueryType(QueryType type);

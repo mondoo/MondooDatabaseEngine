@@ -24,37 +24,13 @@ void main()
 {
 	DB* db = new DB("test.db");
 
+	// Clearing table for tests
 	db->Statement("DELETE FROM test;");
-
-	printf("%s\n", DB::Table("test")->Select({ "hello", "world" })->GetStatement().c_str());
-	printf("%s\n", DB::Table("test")->Select()->GetStatement().c_str());
-
-	printf("%s\n", DB::Table("test")->Insert("Hello", 1, "World", 5031)->GetStatement().c_str());
-	printf("%s\n", DB::Table("test")->Insert(std::vector<ValueType>{ValueType("Hello"), ValueType(1)})->GetStatement().c_str());
-	printf("%s\n", DB::Table("test")->Insert(std::vector<KeyValuePair>{
-		{"Hello", "World"},
-		{"Test 1", "Test 2"},
-		{"Test 2", 10}
-	})->GetStatement().c_str());
-
-	printf("%s\n", DB::Table("test")->Update(std::vector<KeyValuePair>{
-		{"Hello", "World"},
-		{ "Test 1", "Test 2" }
-	})->Where({ "ID", ValueType("1") })->GetStatement().c_str());
-
-	printf("%s\n", DB::Table("test")->Delete()->Where({ "ID", ValueType("1", false) })->GetStatement().c_str());
-
-	printf("==== SELECT TESTS ====\n");
-
-	DB::Table("test")->Select()->ExecStatement();
-	DB::Table("test")->Select({"PATH", "TYPE"})->ExecStatement();
-	printf("%s\n", DB::Table("test")->Select({ "PATH", "TYPE" })->GetStatement().c_str());
 
 	printf("==== INSERT TESTS ====\n");
 	std::srand((unsigned int)std::time(nullptr));
 	for (size_t i = 0; i < 10; i++)
 	{
-
 		DB::Table("test")->Insert(std::vector<KeyValuePair>{
 			{ "PATH", 0 },
 			{ "TYPE", (int)std::rand() },
@@ -62,7 +38,7 @@ void main()
 			{ "BOOL", true },
 			{ "DOUBLE", 0.66798 },
 			{ "FLOAT", 1.345f }
-		})->ExecStatement();
+		})->ExecStatement(true);
 
 		DB::Table("test")->Insert(std::vector<KeyValuePair>{
 			{ "PATH", 120 },
@@ -71,9 +47,15 @@ void main()
 			{ "BOOL", false },
 			{ "DOUBLE", 201.567722 },
 			{ "FLOAT", 12.7745f }
-		})->ExecStatement();
+		})->ExecStatement(true);
 	}
 
+	printf("==== UPDATE TESTS ====\n");
+	DB::Table("test")->Update({ {"PATH", 6}, {"STRING", "Hello world!"} })->Where({ "ID", ValueType("12", false) })->ExecStatement(true);
+
+
+	printf("==== DELETE TESTS ====\n");
+	DB::Table("test")->Delete()->Where({ "ID", ValueType("1", false) })->ExecStatement(true);
 
 	clock_t begin = clock();
 	auto printExecTime = [&begin]() {
@@ -86,7 +68,7 @@ void main()
 	printf("== SELECT ALL ==\n");
 	printf("== ORDER BY ==\n");
 	std::vector<TestTable*> select;
-	DB::Table("test")->Select()->ExecStatement(TestTable::Callback, &select, true);
+	DB::Table("test")->Select()->ExecStatement(true, TestTable::Callback, &select);
 	for (const TestTable* row : select)
 	{
 		if (row != nullptr && row->m_isValid)
@@ -101,7 +83,7 @@ void main()
 	begin = clock();
 	printf("== SINGLE ROW LOOK UP ==\n");
 	std::vector<TestTable*> singleRowLookup;
-	DB::Table("test")->Select()->Where({ "ID", ValueType("12", false) })->ExecStatement(TestTable::Callback, &singleRowLookup, true);
+	DB::Table("test")->Select()->Where({ "ID", ValueType("12", false) })->ExecStatement(true, TestTable::Callback, &singleRowLookup);
 	if (singleRowLookup.size() > 0)
 	{
 		std::cout << fmt::format("\n ID: {} | PATH: {} | TYPE: {} | STRING: {} | BOOL: {} | DOUBLE: {} | FLOAT: {}\n\n\n",
@@ -114,7 +96,7 @@ void main()
 	begin = clock();
 	printf("== ORDER BY ==\n");
 	std::vector<TestTable*> rows;
-	DB::Table("test")->Select()->OrderBy({ {"TYPE", "ASC"} })->ExecStatement(TestTable::Callback, &rows, true);
+	DB::Table("test")->Select()->OrderBy({ {"TYPE", "ASC"} })->ExecStatement(true, TestTable::Callback, &rows);
 
 	for (const TestTable* row : rows)
 	{
@@ -122,6 +104,23 @@ void main()
 		{
 			std::cout << fmt::format("\n ID: {} | PATH: {} | TYPE: {} | STRING: {} | BOOL: {} | DOUBLE: {} | FLOAT: {}\n",
 				row->ID, row->PATH, row->TYPE, row->STRING, row->BOOL ? "TRUE" : "FALSE", row->DOUBLE, row->FLOAT) << std::endl;
+		}
+	}
+
+	printExecTime();
+
+
+	begin = clock();
+	printf("== SPECIFIC COLUMNS ==\n");
+	std::vector<TestTable*> columns;
+	DB::Table("test")->Select({ "TYPE", "DOUBLE" })->ExecStatement(true, TestTable::Callback, &columns);
+
+	for (const TestTable* row : columns)
+	{
+		if (row != nullptr && row->m_isValid)
+		{
+			std::cout << fmt::format("\n TYPE: {} | DOUBLE: {}\n",
+				row->TYPE, row->DOUBLE) << std::endl;
 		}
 	}
 
