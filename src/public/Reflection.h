@@ -5,6 +5,7 @@
 #include <string>
 #include <type_traits>
 #include <sstream>
+#include <vector>
 
 #include "Types.h"
 
@@ -16,9 +17,10 @@ if (Reflection::Struct* structMap = Reflection::StructHelpers::_getStruct(#model
 #define MODELCALLBACK(modelStruct)																						\
 static int Callback(void* out, int count, char** data, char** column){													\
 	if (count > 0){																										\
-		modelStruct* dataOut = (modelStruct*)out;																		\
+		std::vector<modelStruct*>* outVector = (std::vector<modelStruct*>*)out;											\
+		modelStruct* dataOut = new modelStruct();																		\
+		outVector->push_back(dataOut);																					\
 		for (size_t i = 0; i < count; i++) {
-
 
 #define MODELCALLBACKBODY(type, columnName)																				\
 			if (strcmp(#columnName, column[i]) == 0) {																	\

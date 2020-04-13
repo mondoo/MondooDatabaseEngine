@@ -91,6 +91,13 @@ QueryBuilder* QueryBuilder::Where(std::pair<std::string, ValueType> values)
 	return this;
 }
 
+QueryBuilder* QueryBuilder::OrderBy(std::vector<KeyValuePair> values)
+{
+	m_orderBy = values;
+	m_hasOrderBy = true;
+	return this;
+}
+
 const std::string& QueryBuilder::GetTable()
 {
 	return m_table;
@@ -146,6 +153,16 @@ std::pair<std::string, ValueType>& QueryBuilder::GetWhere()
 	return m_where;
 }
 
+bool QueryBuilder::HasOrderBy()
+{
+	return m_hasOrderBy;
+}
+
+std::vector<KeyValuePair>& QueryBuilder::GetOrderBy()
+{
+	return m_orderBy;
+}
+
 std::string QueryBuilder::GetStatement()
 {
 	std::string sql;
@@ -171,25 +188,31 @@ std::string QueryBuilder::GetStatement()
 	return sql + ";";
 }
 
-int QueryBuilder::ExecStatement(int (*callback)(void*, int, char**, char**), void* objectPtr)
+void QueryBuilder::ExecStatement(int (*callback)(void*, int, char**, char**), void* objectPtr, bool printStatement)
 {
+	const std::string statement = GetStatement();
+
 	switch (m_type)
 	{
 	case QueryType::Select:
 		if (callback != nullptr && objectPtr != nullptr)
 		{
-			DB::SelectFill(GetStatement(), callback, objectPtr);
+			DB::SelectFill(statement, callback, objectPtr);
 		}
 		else
 		{
-			DB::Select(GetStatement());
+			DB::Select(statement);
 		}
-		return 0;
+		break;
 	case QueryType::Insert:
-		DB::Insert(GetStatement());
-		return 0;
+		DB::Insert(statement);
+		break;
 	}
-	return 1;
+
+	if (printStatement)
+	{
+		printf(fmt::format("Executed Statement: {}", statement).c_str());
+	}
 }
 
 bool QueryBuilder::SetQueryType(QueryType type)
@@ -232,4 +255,6 @@ void QueryBuilder::Reset()
 	m_values.clear();
 	m_where = {};
 	m_hasWhere = false;
+	m_orderBy = {};
+	m_hasOrderBy = false;
 }

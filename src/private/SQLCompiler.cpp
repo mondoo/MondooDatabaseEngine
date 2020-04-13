@@ -7,7 +7,7 @@
 
 std::string SQLCompiler::CompileSelect(QueryBuilder& query)
 {
-	return fmt::format("SELECT {} FROM {}{}", query.GetColumns(), query.GetTable(), CompileWhere(query.HasWhere(), query.GetWhere()));
+	return fmt::format("SELECT {} FROM {}{}{}", query.GetColumns(), query.GetTable(), CompileWhere(query.HasWhere(), query.GetWhere()), query.HasOrderBy() ? CompileOrderBy(query) : "");
 }
 
 std::string SQLCompiler::CompileInsert(QueryBuilder& query)
@@ -55,4 +55,21 @@ std::string SQLCompiler::CompileDelete(QueryBuilder& query)
 std::string SQLCompiler::CompileWhere(bool hasWhere, std::pair<std::string, ValueType>& where)
 {
 	return hasWhere ? fmt::format(" WHERE `{}` = {}", where.first, where.second.m_value) : "";
+}
+
+std::string SQLCompiler::CompileOrderBy(QueryBuilder& query)
+{
+	std::string orderBy;
+	if (query.HasOrderBy())
+	{
+		orderBy += " ORDER BY ";
+		bool first = true && query.GetOrderBy().size() > 1;
+		for (const KeyValuePair& pair : query.GetOrderBy())
+		{
+			orderBy += fmt::format("`{}` {}{}", pair.m_key, pair.m_value.m_value, first ? ", " : "");
+			if (first) first = false;
+		}
+	}
+
+	return orderBy;
 }

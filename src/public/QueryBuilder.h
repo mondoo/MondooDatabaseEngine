@@ -31,6 +31,7 @@ public:
 	QueryBuilder* Delete();
 
 	QueryBuilder* Where(std::pair<std::string, ValueType> values);
+	QueryBuilder* OrderBy(std::vector<KeyValuePair> values);
 
 	const std::string& GetTable();
 
@@ -43,9 +44,12 @@ public:
 
 	bool HasWhere();
 	std::pair<std::string, ValueType>& GetWhere();
+	bool HasOrderBy();
+	std::vector<KeyValuePair>& GetOrderBy();
 
 	std::string GetStatement();
-	int ExecStatement(int (*callback)(void*, int, char**, char**) = nullptr, void* objectPtr = nullptr);
+
+	void ExecStatement(int (*callback)(void*, int, char**, char**) = nullptr, void* objectPtr = nullptr, bool printStatement = false);
 
 private:
 	bool SetQueryType(QueryType type);
@@ -78,6 +82,8 @@ protected:
 
 	bool m_hasWhere = false;
 	std::pair<std::string, ValueType> m_where = {};
+	bool m_hasOrderBy = false;
+	std::vector<KeyValuePair> m_orderBy = {};
 
 	std::string m_table;
 };
