@@ -60,6 +60,38 @@ struct KeyValuePair
 	ValueType m_value;
 };
 
+namespace Comparison
+{
+	static std::string Equal = "=";
+	static std::string NotEqual = "!=";
+	static std::string GreaterThan = ">";
+	static std::string GreaterThanOrEqual = ">=";
+	static std::string LessThan = "<";
+	static std::string LessThanOrEqual = "<=";
+	static std::string In = "IN";
+	static std::string Not = "NOT";
+	static std::string Between = "BETWEEN";
+	static std::string IsNull = "IS NULL";
+	static std::string NotNull = "IS NOT NULL";
+	static std::string Like = "LIKE";
+	static std::string Exists = "EXISTS";
+}
+
+struct WhereValue
+{
+	WhereValue() = default;
+
+	WhereValue(const std::string& key, const std::string& comparison, const ValueType& value)
+		: m_key(key)
+		, m_comparison(comparison)
+		, m_value(value)
+	{}
+
+	std::string m_key;
+	std::string m_comparison;
+	ValueType m_value;
+};
+
 struct TestTable
 {
 	MODELSTRUCT(TestTable);

@@ -30,7 +30,7 @@ public:
 
 	QueryBuilder* Delete();
 
-	QueryBuilder* Where(std::pair<std::string, ValueType> values);
+	QueryBuilder* Where(std::vector<WhereValue> values);
 	QueryBuilder* OrderBy(std::vector<KeyValuePair> values);
 
 	const std::string& GetTable();
@@ -43,7 +43,7 @@ public:
 	const std::map<std::string, ValueType> GetValueMap();
 
 	bool HasWhere();
-	std::pair<std::string, ValueType>& GetWhere();
+	std::vector<WhereValue>& GetWhere();
 	bool HasOrderBy();
 	std::vector<KeyValuePair>& GetOrderBy();
 
@@ -73,16 +73,10 @@ protected:
 		{"Order", {}}
 	};
 
-	std::vector<std::string> m_operators = {
-		"=", "<", ">", "<=", ">=", "<>", "!=", "<=>", "like", "not like", "&", "|"
-	};
-
 	std::vector<std::string> m_columns = {};
 	std::vector<ValueType> m_values = {};
 
-	bool m_hasWhere = false;
-	std::pair<std::string, ValueType> m_where = {};
-	bool m_hasOrderBy = false;
+	std::vector<WhereValue> m_where = {};
 	std::vector<KeyValuePair> m_orderBy = {};
 
 	std::string m_table;

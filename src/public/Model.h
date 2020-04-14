@@ -5,7 +5,6 @@
 
 #include "DB.h"
 #include "Table.h"
-#include "Types.h"
 
 template<class TModel>
 class Model
